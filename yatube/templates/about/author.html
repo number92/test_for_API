@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Об авторе проекта{% endblock %} 
+{% block content %}
+<h3>{{title}}</h3>
+  <h4 class ="mt-4">Привет, я {{author}} - автор этого проекта</h4>
+    <p>
+    <a class="navbar-brand" href={{github}} target ="_blank">
+    <img src="{% static 'img/github.png' %}" width="30" height="30" class="d-inline-block align-top" alt="">
+    <span style="color:#6610f2">Git</span>hub
+    </a>
+    </p>
+{% endblock %}
