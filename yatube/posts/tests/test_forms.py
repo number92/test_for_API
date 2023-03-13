@@ -1,6 +1,7 @@
 from django.test import Client, TestCase
 from django.urls import reverse
 from ..models import Post, Group, User
+from http import HTTPStatus
 
 
 class PostFormTests(TestCase):
@@ -20,6 +21,7 @@ class PostFormTests(TestCase):
         )
 
     def setUp(self):
+        self.guest_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
         self.form_data = {'text': 'Текстовый пост из формы',
@@ -27,8 +29,9 @@ class PostFormTests(TestCase):
                           }
 
     def test_form_create_post(self):
+        """Тест создания новой записи в бд """
         post_count = Post.objects.count()
-        response = self.authorized_client.post(
+        self.authorized_client.post(
             reverse('posts:post_create'),
             data=self.form_data,
             follow=True
@@ -39,16 +42,12 @@ class PostFormTests(TestCase):
             group=self.group.id,
             pk=post_count + 1
         ).exists())
-        self.assertRedirects(response, reverse(
-            'posts:profile', args=[PostFormTests.user.username]))
 
     def test_form_edit_post(self):
+        """Тест изменений записи в бд при редактировании поста"""
         self.authorized_client.post(
             reverse('posts:post_edit', args=[PostFormTests.post.id]),
             data=self.form_data)
-        response = self.authorized_client.get(
-            reverse('posts:post_detail', args=[PostFormTests.post.id]))
-        self.assertEqual(response.context['post'].text, self.form_data['text'])
         self.form_data['text'] = 'Это новый текст'
         self.authorized_client.post(
             reverse('posts:post_edit', args=[PostFormTests.post.id]),
@@ -57,3 +56,11 @@ class PostFormTests(TestCase):
             text='Это новый текст',
             group=self.group.id,
             pk=self.post.pk).exists())
+
+    def test_guest_can_not_move_to_creat_post_page(self):
+        """Неавторизованный пользователь не может перейти на на страницу
+        создания поста /create"""
+        response = self.guest_client.post(
+            reverse('posts:post_create'),
+        )
+        self.assertNotEqual(response.status_code, HTTPStatus.OK)

@@ -15,7 +15,7 @@
       <div class="card-body">          
         <form method="post" action={% if is_edit %} {% url  'posts:post_edit' form.instance.pk %}
         {% else %}{% url  'posts:post_create' %} {% endif %}>
-          {% csrf_token %}           
+          {% csrf_token %}
           <div class="form-group row my-3 p-3">
             <label for="id_text">
               Текст поста                       

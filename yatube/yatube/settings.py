@@ -12,17 +12,13 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'lww2z8c-zh4t4_=2^py&+$q+-2x3so8d85ze!^6pbjb8@%cyh5'
 
-# SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = True
 
 
@@ -33,8 +29,6 @@ ALLOWED_HOSTS = [
     'testserver',
 ]
 
-
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -82,9 +76,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'yatube.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -92,9 +83,6 @@ DATABASES = {
     }
 }
 
-
-# Password validation
-# https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -112,9 +100,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/2.2/topics/i18n/
-
 LANGUAGE_CODE = 'ru-ru'
 
 TIME_ZONE = 'UTC'
@@ -126,16 +111,15 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.2/howto/static-files/
-
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 
 LOGIN_URL = 'users:login'
 LOGIN_REDIRECT_URL = 'posts:posts'
-# LOGOUT_REDIRECT_URL = 'posts:posts
+
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
+
+CSRF_FAILURE_VIEW = 'core.views.csrf_failure'

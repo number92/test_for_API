@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from http import HTTPStatus
+
+from django.urls import reverse
 from ..models import Group, Post
 
 User = get_user_model()
@@ -28,39 +30,27 @@ class PostModelTest(TestCase):
         self.author_post_client = Client()
         self.author_post_client.force_login(PostModelTest.post.author)
 
-    def test_correct_response_index_templ(self):
-        """Проверка доступности адреса '/'."""
-        response = self.guest_client.get('/')
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-
-    def test_correct_response_group_templ(self):
-        """Проверка доступности адреса '/group/<slug:slug>/'."""
-        response = self.guest_client.get(
-            f'/group/{PostModelTest.group.slug}/')
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-
-    def test_correct_response_profile_templ(self):
-        """Проверка доступности адреса '/profile/<str:username>/'."""
-        response = self.guest_client.get(
-            f'/profile/{PostModelTest.user.username}/')
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-
-    def test_correct_response_post_detail_templ(self):
-        """Проверка доступности адреса 'posts/<int:post_id>/'."""
-        response = self.guest_client.get(
-            f'/posts/{PostModelTest.post.id}/')
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-
-    def test_correct_response_post_create_templ(self):
-        """Проверка доступности адреса '/create/'."""
-        response = self.authorized_client.get('/create/')
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-
-    def test_correct_response_post_edit_templ(self):
-        """Проверка доступности адреса 'posts/<int:post_id>/edit/'."""
-        response = self.authorized_client.get(
-            f'/posts/{PostModelTest.post.id}/edit/')
-        self.assertEqual(response.status_code, HTTPStatus.OK)
+    def test_urls_correct_status_code(self):
+        """
+        Проверка доступности url адресов:
+        '/',
+        'group/<slug:slug>/',
+        'profile/<str:username>/',
+        'posts/<int:post_id>/',
+        'create/',
+        'posts/<int:post_id>/edit/'
+        """
+        url_names = (
+            ('/'),
+            (f'/group/{PostModelTest.group.slug}/'),
+            (f'/profile/{PostModelTest.user.username}/'),
+            (f'/posts/{PostModelTest.post.id}/'),
+            ('/create/'),
+            (f'/posts/{PostModelTest.post.id}/edit/'))
+        for url in url_names:
+            with self.subTest(url=url):
+                response = self.authorized_client.get(url)
+                self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_urls_uses_correct_template_guest_client(self):
         """URL-адрес использует соответствующий шаблон,
@@ -97,3 +87,27 @@ class PostModelTest(TestCase):
             response = self.authorized_client.get(
                 f'/posts/{PostModelTest.post.id}/edit/')
             self.assertEqual(response.status_code, HTTPStatus.OK)
+
+    def test_urls_correct_status_code(self):
+        """Проверка недоступности url адресов для неавторизованноого
+        пользователя: 'create/', 'posts/<int:post_id>/edit/'"""
+        url_names = (
+            ('/create/'),
+            (f'/posts/{PostModelTest.post.id}/edit/'))
+        for url in url_names:
+            with self.subTest(url=url):
+                response = self.guest_client.get(url)
+                self.assertEqual(response.status_code, HTTPStatus.FOUND)
+
+    def test_urls_correct_status_code(self):
+        """Неавторизованного пользователя перенаправляет со страниц
+        /create,posts/<int:post_id>/edit/ на страницу auth/login"""
+        url_names = (
+            ('/create/'),
+            (f'/posts/{PostModelTest.post.id}/edit/'))
+        for url in url_names:
+            with self.subTest(url=url):
+                login_url = reverse('login')
+                target_url = f'{login_url}?next={url}'
+                response = self.guest_client.get(url)
+                self.assertRedirects(response, target_url)

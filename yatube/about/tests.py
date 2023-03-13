@@ -6,15 +6,13 @@ class StaticURLTests(TestCase):
     def setUp(self):
         self.guest_client = Client()
 
-    def test_correct_response_about_author_templ(self):
-        """Проверка доступности адреса 'about/author/'."""
-        response = self.guest_client.get('/about/author/')
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-
-    def test_correct_response_about_tech_templ(self):
-        """Проверка доступности адреса 'about/tech/'."""
-        response = self.guest_client.get('/about/tech/')
-        self.assertEqual(response.status_code, HTTPStatus.OK)
+    def test_status_code_about_app(self):
+        """Проверка доступности адресов 'about/tech/', 'about/author/'."""
+        urls = ['/about/author/', '/about/tech/']
+        for url in urls:
+            with self.subTest(url=url):
+                response = self.guest_client.get(url)
+                self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_urls_uses_correct_template_guest_client(self):
         """URL-адрес использует соответствующий шаблон,

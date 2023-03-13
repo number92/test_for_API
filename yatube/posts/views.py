@@ -34,7 +34,6 @@ def profile(request, username):
     post_list = author.posts.all()
     post_count = post_list.count()
     context = {'author': author,
-               'post_list': post_list,
                'page_obj': get_paginator(request, post_list),
                'post_count': post_count}
     return render(request, template, context)
