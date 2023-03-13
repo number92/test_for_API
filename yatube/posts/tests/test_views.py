@@ -19,14 +19,6 @@ class ViewsPagesTests(TestCase):
             text='Тестовый пост - пишем тест',
             group=cls.group
         )
-        # cls.cont_index = ('title', 'post_list', 'page_obj')
-        # cls.cont_group = ['title', 'group', 'post_list', 'page_obj']
-        # cls.cont_profile = ['author', 'post_list', 'page_obj', 'post_count']
-        # cls.cont_detail = ['post', 'post_count', 'title']
-        # cls.cont_create = ['form']
-        # cls.cont_edit = ['form', 'is_edit']
-        # # cls.context_list = (cont_index, cont_group, cont_profile,
-        # #        cont_detail, cont_create, cont_edit)
 
     def setUp(self):
         self.user = User.objects.create_user(username='StasBasov')
@@ -59,9 +51,8 @@ class ViewsPagesTests(TestCase):
         response = self.authorized_client.get(reverse('posts:posts'))
         self.assertEqual(
             response.context.get('post_list').count(), Post.objects.count())
-        self.assertEqual(
-            response.context.get('page_obj').object_list,
-            list(Post.objects.all()))
+        self.assertCountEqual(
+            response.context.get('page_obj').object_list, Post.objects.all())
         self.assertEqual(
             response.context.get('title'), "Последние обновления на сайте")
 

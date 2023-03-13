@@ -64,3 +64,16 @@ class PostFormTests(TestCase):
             reverse('posts:post_create'),
         )
         self.assertNotEqual(response.status_code, HTTPStatus.OK)
+
+    def test_urls_correct_status_code(self):
+        """Неавторизованного пользователя перенаправляет со страниц
+        /create,posts/<int:post_id>/edit/ на страницу auth/login"""
+        url_names = (
+            ('/create/'),
+            (f'/posts/{PostFormTests.post.id}/edit/'))
+        for url in url_names:
+            with self.subTest(url=url):
+                login_url = reverse('login')
+                target_url = f'{login_url}?next={url}'
+                response = self.guest_client.get(url)
+                self.assertRedirects(response, target_url)

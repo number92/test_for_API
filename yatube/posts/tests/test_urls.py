@@ -1,11 +1,6 @@
-from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from http import HTTPStatus
-
-from django.urls import reverse
-from ..models import Group, Post
-
-User = get_user_model()
+from ..models import Group, Post, User
 
 
 class PostModelTest(TestCase):
@@ -98,16 +93,3 @@ class PostModelTest(TestCase):
             with self.subTest(url=url):
                 response = self.guest_client.get(url)
                 self.assertEqual(response.status_code, HTTPStatus.FOUND)
-
-    def test_urls_correct_status_code(self):
-        """Неавторизованного пользователя перенаправляет со страниц
-        /create,posts/<int:post_id>/edit/ на страницу auth/login"""
-        url_names = (
-            ('/create/'),
-            (f'/posts/{PostModelTest.post.id}/edit/'))
-        for url in url_names:
-            with self.subTest(url=url):
-                login_url = reverse('login')
-                target_url = f'{login_url}?next={url}'
-                response = self.guest_client.get(url)
-                self.assertRedirects(response, target_url)
