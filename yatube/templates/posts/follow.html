@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load thumbnail %}
 {% block content %}
-    <h2>{{ title }}</h2>
+    <h2>Все подписки {{ request.user}}</h2>
     {% include 'posts/includes/switcher.html' %}
     {% for post in page_obj %}
       <ul>

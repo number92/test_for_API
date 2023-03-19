@@ -1,5 +1,7 @@
 from django.test import TestCase, Client
 from http import HTTPStatus
+
+from django.urls import reverse
 from ..models import Group, Post, User
 
 
@@ -93,3 +95,18 @@ class PostModelTest(TestCase):
             with self.subTest(url=url):
                 response = self.guest_client.get(url)
                 self.assertEqual(response.status_code, HTTPStatus.FOUND)
+
+    def test_add_comment_authorised_only(self):
+        """Доступность добавление комментария только
+        авторизованным пользователям"""
+        form_data = {'text': 'Newcomment'}
+        response = self.authorized_client.post(reverse(
+            'posts:add_comment', kwargs={'post_id': self.post.id}),
+            data=form_data,
+            follow=True)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        response_guest = self.guest_client.post(reverse(
+            'posts:add_comment', kwargs={'post_id': self.post.id}),
+            data=form_data,
+            follow=False)
+        self.assertEqual(response_guest.status_code, HTTPStatus.FOUND)
