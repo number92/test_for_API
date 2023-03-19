@@ -120,7 +120,8 @@ def follow_index(request):
     author_post = Post.objects.filter(
         author__following__user=request.user)
     page_obj = get_paginator(request, author_post)
-    context = {'page_obj': page_obj}
+    context = {'author_post': author_post,
+               'page_obj': page_obj}
     return render(request, template, context)
 
 
