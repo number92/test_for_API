@@ -7,6 +7,7 @@ class TemplatesErrorTest(TestCase):
         self.guest_client = Client()
 
     def test_404_error_page(self):
+        """Проверка доступности шаблона для ошибки 404"""
         response = self.guest_client.get('/nonexist-page/')
         self.assertEqual(response.status_code, 404)
-        self.assertTemplateUsed(response.templates, 'core/404.html')
+        self.assertTemplateUsed(response, 'core/404.html')

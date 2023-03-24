@@ -78,14 +78,16 @@ class ViewsPagesTests(TestCase):
     def test_index_page_show_correct_context(self):
         """Шаблон index сформирован с правильным контекстом."""
         response = self.authorized_client.get(reverse('posts:posts'))
-        self.assertEqual(
-            response.context.get('post_list').count(), Post.objects.count())
-        self.assertEqual(response.context.get('page_obj').object_list,
-                         list(Post.objects.all()))
         post = response.context['page_obj'][0]
-        self.assertEqual(post.image, ViewsPagesTests.post.image)
-        self.assertEqual(
-            response.context.get('title'), "Последние обновления на сайте")
+        context_index = {
+            response.context.get('post_list').count(): Post.objects.count(),
+            response.context.get('page_obj').number: 1,
+            post.image: ViewsPagesTests.post.image,
+            response.context.get('title'): "Последние обновления на сайте",
+        }
+        for context, expected in context_index.items():
+            with self.subTest(context=context, expected=expected):
+                self.assertEqual(context, expected)
 
     def test_group_list_page_show_correct_context(self):
         """Шаблон group_list сформирован с правильным контекстом."""

@@ -3,10 +3,8 @@ from .models import Post, Group, Follow, User
 from django.shortcuts import render, get_object_or_404, redirect
 from .forms import PostForm, CommentForm
 from .utils import get_paginator
-from django.views.decorators.cache import cache_page
 
 
-@cache_page(60 * 20, key_prefix='index_page')
 def index(request):
     template = 'posts/index.html'
     title = "Последние обновления на сайте"
@@ -35,14 +33,14 @@ def profile(request, username):
     author = get_object_or_404(User, username=username)
     post_list = author.posts.all()
     post_count = post_list.count()
+    following = (request.user != author
+                 and request.user.is_authenticated
+                 and Follow.objects.filter(user=request.user,
+                                           author=author))
     context = {'author': author,
                'page_obj': get_paginator(request, post_list),
                'post_count': post_count,
-               'following': (request.user != author
-                             and request.user.is_authenticated
-                             and Follow.objects.filter(
-                                 user=request.user,
-                                 author=author))}
+               'following': following}
     return render(request, template, context)
 
 
